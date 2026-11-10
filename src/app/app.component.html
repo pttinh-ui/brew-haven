@@ -1,0 +1,176 @@
+<header class="nav" [class.nav--solid]="scrolled() || menuOpen()">
+  <div class="container nav__inner">
+    <a class="logo" (click)="scrollTo('home')">Brew<span>Haven</span></a>
+
+    <button class="nav__toggle" aria-label="Toggle menu" (click)="menuOpen.set(!menuOpen())">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="nav__links" [class.open]="menuOpen()">
+      @for (link of navLinks; track link.id) {
+        <a (click)="scrollTo(link.id)">{{ link.label }}</a>
+      }
+      <button class="btn btn--small" (click)="scrollTo('visit')">Book a table</button>
+    </nav>
+  </div>
+</header>
+
+<section id="home" class="hero">
+  <div class="container hero__inner">
+    <div class="hero__text">
+      <p class="eyebrow">Specialty coffee · Da Nang</p>
+      <h1>Slow mornings,<br />great coffee.</h1>
+      <p class="lead">
+        Locally roasted beans, hand-crafted drinks and fresh pastries in a calm space made for
+        friends, focus and long conversations.
+      </p>
+      <div class="hero__actions">
+        <button class="btn" (click)="scrollTo('menu')">View menu</button>
+        <button class="btn btn--ghost" (click)="scrollTo('visit')">Reserve a table</button>
+      </div>
+      <ul class="stats">
+        <li><strong>12+</strong><span>Single origins</span></li>
+        <li><strong>4.9★</strong><span>Google rating</span></li>
+        <li><strong>7am</strong><span>Open daily</span></li>
+      </ul>
+    </div>
+    <div class="hero__art" aria-hidden="true">
+      <div class="cup">
+        <div class="cup__steam"><i></i><i></i><i></i></div>
+        <div class="cup__body"><div class="cup__latte"></div></div>
+        <div class="cup__handle"></div>
+        <div class="cup__plate"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section about">
+  <div class="container about__grid">
+    <div class="about__card about__card--1"><h3>Roasted in-house</h3><p>Small batches every week for peak freshness.</p></div>
+    <div class="about__card about__card--2"><h3>Ethically sourced</h3><p>Direct trade with farms in Da Lat and Ethiopia.</p></div>
+    <div class="about__card about__card--3"><h3>Work-friendly</h3><p>Fast Wi-Fi, quiet corners and outlets everywhere.</p></div>
+    <div class="about__text">
+      <p class="eyebrow">Our story</p>
+      <h2>A neighbourhood café with a love for craft</h2>
+      <p>
+        BrewHaven started as a tiny coffee cart in 2019. Today we roast our own beans and serve
+        Vietnamese classics next to modern specialty drinks, always with the same warm welcome.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="menu" class="section menu">
+  <div class="container">
+    <div class="section__head">
+      <p class="eyebrow">Menu</p>
+      <h2>Something for every mood</h2>
+    </div>
+
+    <div class="tabs" role="tablist">
+      @for (cat of categories; track cat) {
+        <button
+          role="tab"
+          class="tab"
+          [class.tab--active]="activeCategory() === cat"
+          [attr.aria-selected]="activeCategory() === cat"
+          (click)="setCategory(cat)"
+        >
+          {{ cat }}
+        </button>
+      }
+    </div>
+
+    <div class="menu__grid">
+      @for (item of filteredMenu(); track item.name) {
+        <article class="menu__item">
+          <div class="menu__top">
+            <h3>{{ item.name }}</h3>
+            <span class="price">{{ item.price | currency: 'USD' }}</span>
+          </div>
+          <p>{{ item.description }}</p>
+          @if (item.tag) {
+            <span class="badge">{{ item.tag }}</span>
+          }
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="section reviews">
+  <div class="container">
+    <div class="section__head">
+      <p class="eyebrow">Reviews</p>
+      <h2>Loved by our regulars</h2>
+    </div>
+    <div class="reviews__grid">
+      @for (r of reviews; track r.name) {
+        <figure class="review">
+          <div class="review__stars">
+            @for (s of stars(r.rating); track $index) {<span>★</span>}
+          </div>
+          <blockquote>“{{ r.text }}”</blockquote>
+          <figcaption>{{ r.name }}</figcaption>
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<section id="visit" class="section visit">
+  <div class="container visit__grid">
+    <div class="visit__info">
+      <p class="eyebrow">Visit us</p>
+      <h2>Come say hi</h2>
+      <ul class="info">
+        <li><strong>Address</strong><span>123 Bach Dang, Hai Chau, Da Nang</span></li>
+        <li><strong>Hours</strong><span>Mon – Sun · 7:00 – 22:00</span></li>
+        <li><strong>Phone</strong><span>+84 000 000 000</span></li>
+      </ul>
+    </div>
+
+    <form class="booking" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3>Reserve a table</h3>
+
+      @if (submitted()) {
+        <div class="alert">Thanks! Your reservation request has been received. (Demo only)</div>
+      }
+
+      <label>
+        Name
+        <input formControlName="name" placeholder="Your name" [class.error]="invalid('name')" />
+        @if (invalid('name')) {<small>Please enter at least 2 characters.</small>}
+      </label>
+
+      <label>
+        Email
+        <input formControlName="email" type="email" placeholder="you@example.com" [class.error]="invalid('email')" />
+        @if (invalid('email')) {<small>Please enter a valid email.</small>}
+      </label>
+
+      <div class="row">
+        <label>
+          Date
+          <input formControlName="date" type="date" [min]="today" [class.error]="invalid('date')" />
+          @if (invalid('date')) {<small>Pick a date.</small>}
+        </label>
+        <label>
+          Guests
+          <input formControlName="guests" type="number" min="1" max="12" [class.error]="invalid('guests')" />
+          @if (invalid('guests')) {<small>1 to 12 guests.</small>}
+        </label>
+      </div>
+
+      <button class="btn btn--full" type="submit">Send request</button>
+    </form>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <span class="logo">Brew<span>Haven</span></span>
+    <span>© {{ year }} BrewHaven · Demo project built with Angular</span>
+  </div>
+</footer>
